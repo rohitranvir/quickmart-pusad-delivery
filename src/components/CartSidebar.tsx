@@ -17,7 +17,9 @@ interface CartSidebarProps {
 
 export const CartSidebar = ({ isOpen, onClose, items, onQuantityChange, onCheckout }: CartSidebarProps) => {
   const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const deliveryFee = totalAmount >= 299 ? 0 : 25;
+  // First delivery free, then ₹15 delivery fee (free over ₹299)
+  const isFirstOrder = localStorage.getItem('quickmart_first_order') !== 'false';
+  const deliveryFee = isFirstOrder || totalAmount >= 299 ? 0 : 15;
   const finalAmount = totalAmount + deliveryFee;
 
   return (
@@ -91,9 +93,14 @@ export const CartSidebar = ({ isOpen, onClose, items, onQuantityChange, onChecko
                       ₹{deliveryFee}
                     </span>
                   </div>
-                  {totalAmount < 299 && (
+                  {!isFirstOrder && totalAmount < 299 && (
                     <p className="text-xs text-muted-foreground">
                       Add ₹{299 - totalAmount} more for free delivery
+                    </p>
+                  )}
+                  {isFirstOrder && (
+                    <p className="text-xs text-success">
+                      🎉 First delivery is FREE!
                     </p>
                   )}
                 </div>

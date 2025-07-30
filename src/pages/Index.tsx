@@ -71,10 +71,16 @@ const Index = () => {
   };
 
   const handleCheckout = () => {
+    // Mark first order as completed for future delivery fee calculation
+    localStorage.setItem('quickmart_first_order', 'false');
+    
     toast({
-      title: "Checkout feature coming soon!",
-      description: "We're working on the checkout process. Stay tuned!",
+      title: "Order placed successfully! 🎉",
+      description: "Your groceries will be delivered in 30-45 minutes. Cash on delivery.",
     });
+    
+    // Clear cart and close sidebar
+    setCartItems({});
     setIsCartOpen(false);
   };
 
