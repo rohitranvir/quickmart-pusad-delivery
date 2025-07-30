@@ -3,6 +3,12 @@ import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-grocery.jpg";
 
 export const HeroSection = () => {
+  const scrollToProducts = () => {
+    const productsSection = document.querySelector('#products-section');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   return (
     <section className="relative bg-gradient-to-br from-fresh-green-light to-warm-orange-light py-12 md:py-20 overflow-hidden">
       <div className="container mx-auto px-4">
@@ -21,10 +27,20 @@ export const HeroSection = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="lg" className="text-lg px-8 py-6">
+              <Button 
+                variant="hero" 
+                size="lg" 
+                className="text-lg px-8 py-6"
+                onClick={scrollToProducts}
+              >
                 Start Shopping Now
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="text-lg px-8 py-6"
+                onClick={scrollToProducts}
+              >
                 View Menu
               </Button>
             </div>
