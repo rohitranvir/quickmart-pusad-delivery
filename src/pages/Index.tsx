@@ -5,6 +5,7 @@ import { CategorySection } from "@/components/CategorySection";
 import { ProductCard } from "@/components/ProductCard";
 import { CartSidebar } from "@/components/CartSidebar";
 import { CheckoutModal, UserDetails } from "@/components/CheckoutModal";
+import { AdminSettings } from "@/components/AdminSettings";
 import { sampleProducts } from "@/data/products";
 import { useToast } from "@/hooks/use-toast";
 
@@ -14,6 +15,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const { toast } = useToast();
 
   // Filter products based on category and search
@@ -81,9 +83,43 @@ const Index = () => {
     setIsCheckoutOpen(true);
   };
 
-  const handlePlaceOrder = (userDetails: UserDetails) => {
+  const handlePlaceOrder = async (userDetails: UserDetails) => {
     // Mark first order as completed for future delivery fee calculation
     localStorage.setItem('quickmart_first_order', 'false');
+    
+    // Send webhook notification if configured
+    const webhookUrl = localStorage.getItem('quickmart_webhook_url');
+    if (webhookUrl) {
+      try {
+        await fetch(webhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          mode: "no-cors",
+          body: JSON.stringify({
+            order_id: `QM${Date.now()}`,
+            customer_name: userDetails.name,
+            customer_phone: userDetails.phone,
+            delivery_address: userDetails.address,
+            landmark: userDetails.landmark || '',
+            total_amount: totalAmount + deliveryFee,
+            delivery_fee: deliveryFee,
+            items: cartItemsWithDetails.map(item => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+              total: item.price * item.quantity
+            })),
+            order_time: new Date().toISOString(),
+            delivery_city: "Pusad, Maharashtra",
+            payment_method: "Cash on Delivery"
+          }),
+        });
+      } catch (error) {
+        console.error("Failed to send webhook notification:", error);
+      }
+    }
     
     toast({
       title: "Order placed successfully! 🎉",
@@ -102,6 +138,7 @@ const Index = () => {
         onCartClick={() => setIsCartOpen(true)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        onAdminClick={() => setIsAdminOpen(true)}
       />
       
       <main>
@@ -165,6 +202,11 @@ const Index = () => {
         totalAmount={totalAmount}
         deliveryFee={deliveryFee}
         itemCount={cartCount}
+      />
+
+      <AdminSettings
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
       />
     </div>
   );

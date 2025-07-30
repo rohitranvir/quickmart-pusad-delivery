@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, MapPin } from "lucide-react";
+import { Search, ShoppingCart, MapPin, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -7,9 +7,10 @@ interface HeaderProps {
   onCartClick: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onAdminClick: () => void;
 }
 
-export const Header = ({ cartCount, onCartClick, searchQuery, onSearchChange }: HeaderProps) => {
+export const Header = ({ cartCount, onCartClick, searchQuery, onSearchChange, onAdminClick }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border shadow-soft">
       <div className="container mx-auto px-4 py-3">
@@ -41,21 +42,34 @@ export const Header = ({ cartCount, onCartClick, searchQuery, onSearchChange }: 
             </div>
           </div>
 
-          {/* Cart */}
-          <Button
-            variant="outline"
-            size="default"
-            onClick={onCartClick}
-            className="relative"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            <span className="hidden sm:inline ml-2">Cart</span>
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-warm-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {cartCount}
-              </span>
-            )}
-          </Button>
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            {/* Admin Settings */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onAdminClick}
+              className="hidden sm:flex"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+
+            {/* Cart */}
+            <Button
+              variant="outline"
+              size="default"
+              onClick={onCartClick}
+              className="relative"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span className="hidden sm:inline ml-2">Cart</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-warm-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </header>
