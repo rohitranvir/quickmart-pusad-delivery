@@ -4,6 +4,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { CategorySection } from "@/components/CategorySection";
 import { ProductCard } from "@/components/ProductCard";
 import { CartSidebar } from "@/components/CartSidebar";
+import { CheckoutModal, UserDetails } from "@/components/CheckoutModal";
 import { sampleProducts } from "@/data/products";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,6 +13,7 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const { toast } = useToast();
 
   // Filter products based on category and search
@@ -33,7 +35,7 @@ const Index = () => {
     return filtered;
   }, [selectedCategory, searchQuery]);
 
-  // Get cart items with product details
+  // Get cart items with product details and calculate totals
   const cartItemsWithDetails = useMemo(() => {
     return Object.entries(cartItems)
       .filter(([_, quantity]) => quantity > 0)
@@ -43,6 +45,10 @@ const Index = () => {
       })
       .filter(Boolean) as (typeof sampleProducts[0] & { quantity: number })[];
   }, [cartItems]);
+
+  const totalAmount = cartItemsWithDetails.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const isFirstOrder = localStorage.getItem('quickmart_first_order') !== 'false';
+  const deliveryFee = isFirstOrder || totalAmount >= 299 ? 0 : 15;
 
   const cartCount = Object.values(cartItems).reduce((sum, quantity) => sum + quantity, 0);
 
@@ -71,17 +77,22 @@ const Index = () => {
   };
 
   const handleCheckout = () => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  };
+
+  const handlePlaceOrder = (userDetails: UserDetails) => {
     // Mark first order as completed for future delivery fee calculation
     localStorage.setItem('quickmart_first_order', 'false');
     
     toast({
       title: "Order placed successfully! 🎉",
-      description: "Your groceries will be delivered in 30-45 minutes. Cash on delivery.",
+      description: `Hi ${userDetails.name}! Your groceries will be delivered in 30-45 minutes. Cash on delivery.`,
     });
     
-    // Clear cart and close sidebar
+    // Clear cart and close modal
     setCartItems({});
-    setIsCartOpen(false);
+    setIsCheckoutOpen(false);
   };
 
   return (
@@ -145,6 +156,15 @@ const Index = () => {
         items={cartItemsWithDetails}
         onQuantityChange={handleQuantityChange}
         onCheckout={handleCheckout}
+      />
+
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        onPlaceOrder={handlePlaceOrder}
+        totalAmount={totalAmount}
+        deliveryFee={deliveryFee}
+        itemCount={cartCount}
       />
     </div>
   );
