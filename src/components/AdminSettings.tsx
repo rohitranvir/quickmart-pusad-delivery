@@ -12,17 +12,11 @@ interface AdminSettingsProps {
 }
 
 export const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
-  const [webhookUrl, setWebhookUrl] = useState("");
+  const [webhookUrl, setWebhookUrl] = useState("https://hooks.zapier.com/hooks/catch/24006790/u4ufyst/");
   const [isTestingWebhook, setIsTestingWebhook] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Load saved webhook URL
-    const saved = localStorage.getItem('quickmart_webhook_url');
-    if (saved) {
-      setWebhookUrl(saved);
-    }
-  }, []);
+ 
 
   const handleSaveWebhook = () => {
     localStorage.setItem('quickmart_webhook_url', webhookUrl);

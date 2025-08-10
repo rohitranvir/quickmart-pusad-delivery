@@ -44,15 +44,18 @@ export const Header = ({ cartCount, onCartClick, searchQuery, onSearchChange, on
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            {/* Admin Settings */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onAdminClick}
-              className="hidden sm:flex"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
+            {/* Admin Settings - Show only if quickmart_admin is set */}
+{localStorage.getItem("quickmart_admin") === "true" && (
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={onAdminClick}
+    className="hidden sm:flex"
+  >
+    <Settings className="w-4 h-4" />
+  </Button>
+)}
+
 
             {/* Cart */}
             <Button
